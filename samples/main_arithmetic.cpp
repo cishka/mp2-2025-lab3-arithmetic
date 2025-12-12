@@ -1,26 +1,6 @@
 // реализация пользовательского приложения
 #include"arithmetic.h"
 #include <iostream>
-using namespace std;
-/*int main()
-{
-    string expr;
-    cout << "vvedite vyrash: ";
-    getline(cin, expr);
-
-    try {
-        TPostfix p(expr);
-        p.ToPostfix();
-        cout << "PostFix: " << p.GetPostfix() << endl;
-        cout << "result = " << p.calculated() << endl;
-    }
-    catch (const exception& e) {
-        cout << "error: " << e.what() << endl;
-    }
-
-    return 0;
- 
-}*/
 
 int main() {
     std::cout << "=== ARITHMETIC EXPRESSION CALCULATOR ===\n\n";
@@ -66,8 +46,18 @@ int main() {
             TPostfix calculator(input);
 
             calculator.ToPostfix();
+            auto var_set = calculator.Getvar();
+            std::map<std::string, double> values;
+            for (const auto& var : var_set) {
+                std::cout << "Enter value for " + var + ": ";
+                double val;
+                std::cin >> val;
+                values[var] = val;
+            }
 
-            double result = calculator.calculated();
+            if (!var_set.empty()) std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            double result = calculator.calculated(values);
 
             std::cout << "\nRESULTS:\n";
             std::cout << "  Original expression: " << calculator.GetInfix() << "\n";
@@ -77,6 +67,7 @@ int main() {
         catch (const std::exception& e) {
             std::cout << "\nERROR: " << e.what() << "\n";
             std::cout << "Please try entering the expression again.\n\n";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
 

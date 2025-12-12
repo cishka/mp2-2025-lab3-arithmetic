@@ -10,6 +10,7 @@
 
 #include<iostream>
 #include <stdexcept>
+#include <new>
 
 template<typename T>
 class Stack {
@@ -19,7 +20,8 @@ private:
 	int top;
 	void resize() {
 		size_t newsize = (size == 0) ? 8 : size * 2;
-		T* newmem = new T[newsize];
+		T* newmem = new (std::nothrow) T[newsize];
+		if (!newmem) throw std::bad_alloc();
 		for (size_t i = 0; i < size; ++i) {
 			newmem[i] = mem[i];
 		}
@@ -28,11 +30,15 @@ private:
 		size = newsize;
 	}
 public:
-	Stack(): mem(new T[8]), size(8), top(0) {};		// создает стек с начальной емкостью 8
+	Stack(): size(8), top(0) {
+		mem = new(std::nothrow) T[8];
+		if (!mem) throw std::bad_alloc();
+	}		// создает стек с начальной емкостью 8
 
 	explicit Stack(int sz) : size(sz), top(0) {     //создает стек заданной емкости
 		if (sz <= 0) throw std::invalid_argument("the stack size must be positive");
 		mem = new T[sz];
+		if (!mem) throw std::bad_alloc();
 	}
 
 	~Stack() {

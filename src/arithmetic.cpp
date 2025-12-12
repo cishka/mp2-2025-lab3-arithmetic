@@ -21,6 +21,7 @@ using namespace std;
 	TPostfix::TPostfix(const string& s): infix(s), postfix(""){}
 
 	void TPostfix::ToPostfix() {
+		var.clear();
 		Stack<string> op;
 		stringstream out;
 		size_t i = 0;
@@ -66,19 +67,28 @@ using namespace std;
 					i++;
 					pos++;
 				}
-				pos += name.length();
 
-				if (!func.count(name)) throw runtime_error("error in format func");
+				//if (!func.count(name)) throw runtime_error("error in format func");
 
-				if (i >= infix.length() || infix[i] != '(') throw runtime_error("after func need '('");
+				//if (i >= infix.length() || infix[i] != '(') throw runtime_error("after func need '('");
 
-				op.Push(name);
-				op.Push("(");
-				i++; pos++;
+				//op.Push(name);
+				//op.Push("(");
+				//i++; pos++;
+				//continue;
+				if (i < infix.length() && infix[i] == '(' && func.count(name)) {
+					op.Push(name);
+					op.Push("(");
+					i++; pos++;
+				}
+				else {
+					if (func.count(name)) throw runtime_error("func ' " + name + "' must be follow by ( pos" + to_string(pos - name.length()));
+					out << name << " ";
+					var.insert(name);
+				}
 				continue;
 
 			}
-
 			if (c == '(') {
 				op.Push("(");
 				i++, pos++;
@@ -121,7 +131,7 @@ using namespace std;
 		postfix = out.str();
 	}
 
-	double TPostfix::calculated() const {
+	double TPostfix::calculated(const std::map<std::string, double>& vars) const {
 		Stack<double> st;
 		stringstream ss(postfix);
 		string tok;
@@ -150,9 +160,19 @@ using namespace std;
 				else if (tok == "exp") st.Push(exp(x));
 			}
 			else {
-				st.Push(stod(tok));
+				double vall;
+				try {
+					vall = stod(tok);
+				}
+				catch (const std::invalid_argument&) {
+					auto it = vars.find(tok);
+					if (it == vars.end()) throw std::runtime_error("no value provided for var: " + tok);
+					vall = it->second;
+				}
+				st.Push(vall);
 			}
 		}
+		if (st.Getsize() != 1) throw std::runtime_error("invalid expression");
 		return st.Pop();
 	}
 
