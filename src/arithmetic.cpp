@@ -68,18 +68,16 @@ using namespace std;
 					pos++;
 				}
 
-				//if (!func.count(name)) throw runtime_error("error in format func");
 
-				//if (i >= infix.length() || infix[i] != '(') throw runtime_error("after func need '('");
-
-				//op.Push(name);
-				//op.Push("(");
-				//i++; pos++;
-				//continue;
-				if (i < infix.length() && infix[i] == '(' && func.count(name)) {
-					op.Push(name);
-					op.Push("(");
-					i++; pos++;
+				if (i < infix.length() && infix[i] == '(') {
+					if (func.count(name)) {
+						op.Push(name);
+						op.Push("(");
+						i++; pos++;
+					}
+					else {
+						throw runtime_error("uxknow func' " + name + "' at position " + to_string(pos - name.length()));
+					}
 				}
 				else {
 					if (func.count(name)) throw runtime_error("func ' " + name + "' must be follow by ( pos" + to_string(pos - name.length()));
